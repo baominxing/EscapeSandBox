@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>D:\测试项目\EscapeSandBox\EscapeSandBox.Api\bin\Release\net6.0\publish\</_PublishTargetUrl>
+    <History>True|2022-09-23T05:47:24.0473696Z;True|2022-09-23T13:47:07.8955705+08:00;True|2022-09-23T13:45:42.1322211+08:00;True|2022-09-21T17:55:12.8733090+08:00;True|2022-09-21T17:51:02.6197599+08:00;True|2022-09-20T16:48:20.6787261+08:00;True|2022-09-20T14:37:32.7705948+08:00;True|2022-09-20T14:13:50.0614037+08:00;True|2022-09-20T14:07:16.7870372+08:00;True|2022-09-20T14:02:20.9563790+08:00;True|2022-09-20T13:53:05.4182439+08:00;True|2022-09-20T13:52:30.1013281+08:00;True|2022-09-20T13:51:58.9426112+08:00;True|2022-09-19T14:19:40.9423698+08:00;</History>
+  </PropertyGroup>
+</Project>
