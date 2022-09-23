@@ -50,7 +50,31 @@ namespace EscapeSandBox.Api.Core
                         ws.WriteLine("events {");
                         ws.WriteLine("    worker_connections 1024;");
                         ws.WriteLine("}");
-
+                        ws.WriteLine("");
+                        ws.WriteLine("http {");
+                        ws.WriteLine("    client_max_body_size 20m;");
+                        ws.WriteLine("    include /etc/nginx/mime.types;");
+                        ws.WriteLine("    default_type application/octet-stream;");
+                        ws.WriteLine("    log_format main '$remote_addr - $remote_user [$time_local] \"$request\" '");
+                        ws.WriteLine("                    '$status $body_bytes_sent \"$http_referer\" '");
+                        ws.WriteLine("                    '\"$http_user_agent\" \"$http_x_forwarded_for\"';");
+                        ws.WriteLine("    access_log /var/log/nginx/access.log main;");
+                        ws.WriteLine("    sendfile on;");
+                        ws.WriteLine("    keepalive_timeout 65;");
+                        ws.WriteLine("");
+                        ws.WriteLine("    server {");
+                        ws.WriteLine("        listen 8001;");
+                        ws.WriteLine("        server_name localhost;");
+                        ws.WriteLine("        root /usr/share/nginx/html;");
+                        ws.WriteLine("        location ^~/index.html {");
+                        ws.WriteLine("            add_header Cache-Control no-store;");
+                        ws.WriteLine("        }");
+                        ws.WriteLine("");
+                        ws.WriteLine("        location / {");
+                        ws.WriteLine("            try_files $uri /index.html;");
+                        ws.WriteLine("        }");
+                        ws.WriteLine("    }");
+                        ws.WriteLine("}");
                         ws.WriteLine("stream{");
                         foreach (var item in agentAppDtos)
                         {

@@ -24,16 +24,31 @@ namespace EscapeSandBox.Api.Controllers
 
         [HttpPost]
         [Route("GetToken")]
-        public IActionResult GetToken(GetTokenDto input)
+        public R<dynamic> GetToken(GetTokenDto input)
         {
-            Agent agent = _userRepository.FirstOrDefault(s => s.Code == input.Code);
+            var r = new R<dynamic>();
 
-            if (null != agent && input.Password == ApiConfig.DefaultPassword)
+            try
             {
-                return Ok(_tokenHelper.CreateToken(agent));
+                Agent agent = _userRepository.FirstOrDefault(s => s.Code == input.Code);
+
+                if ((null != agent || input.Code == ApiConfig.Admin) && input.Password == ApiConfig.DefaultPassword)
+                {
+                    r.Data = _tokenHelper.CreateToken(agent ?? new Agent { Code = ApiConfig.Admin, IpAddress = "127.0.0.1" });
+                }
+                else
+                {
+                    r.Status = EnumStatus.Failure;
+                    r.Message = "账号或密码不正确";
+                }
+            }
+            catch (Exception ex)
+            {
+                r.Status = EnumStatus.Failure;
+                r.Message = ex.Message;
             }
 
-            return BadRequest();
+            return r;
         }
     }
 }

@@ -1,5 +1,7 @@
+using Agent.Core;
 using Flurl.Http;
 using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 
@@ -64,11 +66,11 @@ namespace Agent
                     .WithOAuthBearerToken(token.TokenContent)
                     .WithTimeout(TimeSpan.FromSeconds(ConfigContent.FlurlApiTimeOut))
                     .PostJsonAsync(new AgentUdpateDto { Code = ConfigContent.AppId, IpAddress = ipAddress })
-                    .ReceiveJson<ResponseDto>();
+                    .ReceiveJson<R<dynamic>>();
 
-                if (!response.Success)
+                if (response.Status != EnumStatus.Success)
                 {
-                    throw new Exception(response.ErrorMessage);
+                    throw new Exception(response.Message);
                 }
 
                 _logger.LogInformation($"UpdateAgentIpAddress Done. Agent:{ConfigContent.AppId},IpAddress:{ipAddress}");
@@ -92,12 +94,12 @@ namespace Agent
                     {
                         Code = ConfigContent.AppId,
                         Password = ConfigContent.AppPassword
-                    }).ReceiveJson<TokenDto>().Result;
+                    }).ReceiveJson<R<TokenDto>>().Result;
 
 
                 _logger.LogInformation($"GetToken {JsonConvert.SerializeObject(token_result)}");
 
-                return token_result;
+                return token_result.Data;
             }
             catch (Exception ex)
             {
@@ -133,8 +135,43 @@ namespace Agent
     {
         public bool Success { get; set; }
 
-        public string ErrorMessage { get; set; }
+        public string Message { get; set; }
 
         public object Data { get; set; }
+    }
+
+    public class R<T>
+    {
+        /// <summary>
+        /// 请求状态
+        /// </summary>
+        public EnumStatus Status { get; set; } = EnumStatus.Success;
+
+        private string? _msg;
+
+        /// <summary>
+        /// 消息描述
+        /// </summary>
+        public string Message
+        {
+            get { return !string.IsNullOrEmpty(_msg) ? _msg : EnumHelper.GetEnumDescription(Status); }
+            set { _msg = value; }
+        }
+
+        /// <summary>
+        /// 返回结果
+        /// </summary>
+        public T? Data { get; set; }
+    }
+
+    public enum EnumStatus
+    {
+        [Description("请求成功")]
+        Success = 1,
+        [Description("请求失败")]
+        Failure = 0,
+        [Description("请求异常")]
+        Unknown = -1,
+
     }
 }

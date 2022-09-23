@@ -17,7 +17,9 @@ namespace EscapeSandBox.Api
             // Add services to the container.
 
             builder.Configuration
+#if !DEBUG
                 .AddJsonFile("host.json")
+#endif
                 .AddJsonFile("appsettings.json");
 
             new ApiConfig().Initialize(builder.Configuration);
@@ -26,7 +28,7 @@ namespace EscapeSandBox.Api
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy(ApiConfig.DefaultCors,  policy =>
+                options.AddPolicy(ApiConfig.DefaultCors, policy =>
                 {
                     policy
                     .AllowAnyOrigin()
