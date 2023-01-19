@@ -17,8 +17,7 @@ namespace EscapeSandBox.Api.Core
         {
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.NameIdentifier,agent.Code),
-                new Claim(ClaimTypes.Name, agent.IpAddress)
+                new Claim(ClaimTypes.DateOfBirth ,"20")
             };
 
             return CreateToken(claims);

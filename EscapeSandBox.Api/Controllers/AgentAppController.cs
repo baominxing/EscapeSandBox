@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 namespace EscapeSandBox.Api.Controllers
 {
     [Route("AgentApp")]
+    [Authorize()]
     public class AgentAppController : BaseController
     {
         private readonly ILogger<AgentAppController> _logger;

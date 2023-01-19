@@ -3,7 +3,9 @@ using EscapeSandBox.Api.Domain;
 using EscapeSandBox.Api.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace EscapeSandBox.Api
@@ -61,8 +63,11 @@ namespace EscapeSandBox.Api
             builder.Services.AddAuthorization(options =>
             {
                 // By default, all incoming requests will be authorized according to the default policy.
-                options.FallbackPolicy = options.DefaultPolicy;
+                // options.FallbackPolicy = options.DefaultPolicy;
+                options.AddPolicy("EmployeeOnly", policy => policy.RequireClaim(ClaimTypes.Email, "minxing.bao@wimisoft.com"));
             });
+
+            builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
 
             builder.Services.AddTransient(typeof(IDapperRepository<,>), typeof(DapperRepository<,>));
 
@@ -88,5 +93,39 @@ namespace EscapeSandBox.Api
 
             app.Run();
         }
+    }
+
+    public class MinimumAgeHandler : AuthorizationHandler<MinimumAgeRequirement>
+    {
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumAgeRequirement requirement)
+        {
+            var dateOfBirthClaim = context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth);
+
+            if (dateOfBirthClaim is null)
+            {
+                return Task.CompletedTask;
+            }
+
+            var dateOfBirth = Convert.ToDateTime(dateOfBirthClaim.Value);
+            int calculatedAge = DateTime.Today.Year - dateOfBirth.Year;
+            if (dateOfBirth > DateTime.Today.AddYears(-calculatedAge))
+            {
+                calculatedAge--;
+            }
+
+            if (calculatedAge >= requirement.MinimumAge)
+            {
+                context.Succeed(requirement);
+            }
+
+            return Task.CompletedTask;
+        }
+    }
+
+    public class MinimumAgeRequirement : IAuthorizationRequirement
+    {
+        public MinimumAgeRequirement(int minimumAge) => MinimumAge = minimumAge;
+
+        public int MinimumAge { get; }
     }
 }
